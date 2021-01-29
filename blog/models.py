@@ -8,3 +8,6 @@ class Post(models.Model):   # settings의 app에 등록해줘야 함
 
     created = models.DateTimeField()    # 글 작성 날짜, 시간
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, default=1)   #작성자 user와(미리 정의) 연결!, 참조 무결성 제약
+
+    def __str__(self):  # 객체를 문자열로 바꿨을 때 어떤 식으로 나올지 변경하는 함수
+        return '{} :: {}'.format(self.title, self.author)
