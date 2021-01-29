@@ -7,7 +7,8 @@
 <body>
 <h1>Blog</h1>
 
-{% for p in posts %}    <!-- p로 각 전달 받은 object 접근 가능하다! -->
+
+{% for p in object_list %}
 <h3> {{ p.title }} </h3>
 <h4> {{ p.created }} by {{ p.auther }}</h4>     <!-- 작성 날짜 by 작성자-->
 <p> {{ p.content }} </p>
