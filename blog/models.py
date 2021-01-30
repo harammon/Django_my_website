@@ -13,3 +13,7 @@ class Post(models.Model):
 
     def __str__(self):
         return '{} :: {}'.format(self.title, self.author)
+
+    # 관리자 화면에서 view on site 구축 함수!! 장고 내장..!!
+    def get_absolute_url(self):
+        return '/blog/{}/'.format(self.pk)
