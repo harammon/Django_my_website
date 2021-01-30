@@ -48,6 +48,9 @@ class TestView(TestCase):
         self.assertEqual(Post.objects.count(), 0)   # db 명령 (get, all 과 같은 것) -> 테스트 코드 내에서 아직 포스트를 생성하지 않았기때문에 포스트의 개수는 0이다.
         self.assertIn('아직 게시물이 없습니다.', soup.body.text)  #포스트 0개이기 때문에 html 내에서 아직 게시물이 없습니다. 가 동작하고, 따라서 테스트도 통과한다.
 
+
+
+
         # 포스트 생성! -> 테스트는 db를 제로베이스에서 실행하기 때문에 브라우저 상황과는 관계 없이 새로 생성해야함.
         post_000 = create_post(
             title = "Example",
@@ -62,6 +65,9 @@ class TestView(TestCase):
         body = soup.body
         self.assertNotIn('아직 게시물이 없습니다.', body.text)    # 게시물이 하나 있기 때문에 이게 출력 안됨,, 따라서 테스트 통과함(notin!!)
         self.assertIn(post_000.title, body.text)
+
+        post_000_read_more_btn = body.find('a', id='read-more-post-{}'.format(post_000.pk))
+        self.assertEqual(post_000_read_more_btn['href'], post_000.get_absolute_url()) # 버튼을 눌렀을 때의 링크가 해당 포스트의 url과 일치하는지 검사
 
         # 각 포스터 내에 네비게이션바가 있는지 확인하는 테스트
         # 함수가 실행하는 순간에는, 포스트가 하나도 없음
@@ -89,3 +95,10 @@ class TestView(TestCase):
         self.assertEqual(title.text, '{} - Blog'.format(post_000.title))
 
         self.check_navbar(soup)     # 원래는 post_detail.html 내에 네비바가 없으므로 에러!! -> html 수정 후 (네비 바 추가) 테스트 돌려보기! 이것이 tdd 개발 방식!!
+
+        body = soup.body
+        main_div = body.find('div', id='main_div')
+        self.assertIn(post_000.title, main_div.text)
+        self.assertIn(post_000.author.username, main_div.text)
+
+        self.assertIn(post_000.content, main_div.text)

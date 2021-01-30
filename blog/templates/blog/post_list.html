@@ -14,11 +14,11 @@
                 <h2 class="card-title">{{ p.title }}</h2>
                 <!--                  <p class="card-text">{{ p.content }}</p>-->
                 <p class="card-text">{{ p.content | truncatewords:50 }}</p>     <!-- 트런케이트! 긴 글에 적용 -->
-                <a href="#" class="btn btn-primary">Read More &rarr;</a>
+                <a href="{{ p.get_absolute_url }}" class="btn btn-primary" id="read-more-post-{{ p.pk }}">Read More &rarr;</a>  <!-- p.get_absolute_url'()' 안써줌!! 예외!!!  -->
                 </div>
                 <div class="card-footer text-muted">
-                Posted on {{ p.created }} by {{ p.author }}
-                <a href="#">Start Bootstrap</a>
+                Posted on {{ p.created }} by
+                <a href="#">{{ p.author }}</a>
                 </div>
             </div>
         {% endfor %}
