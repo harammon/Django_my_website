@@ -99,7 +99,8 @@
               {% endif %}
               <div class="card-body">
                   <h2 class="card-title">{{ p.title }}</h2>
-                  <p class="card-text">{{ p.content }}</p>
+<!--                  <p class="card-text">{{ p.content }}</p>-->
+                  <p class="card-text">{{ p.content | truncatewords:50 }}</p>     <!-- 트런케이트! 긴 글에 적용 -->
                   <a href="#" class="btn btn-primary">Read More &rarr;</a>
               </div>
               <div class="card-footer text-muted">
