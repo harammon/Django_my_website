@@ -89,11 +89,14 @@
       <div class="col-md-8">
           <h1 class="my-4">Blog
           </h1>
-
           {% for p in object_list %}
           <!-- Blog Post -->
           <div class="card mb-4">
-              <img class="card-img-top" src="http://placehold.it/750x300" alt="Card image cap">
+              {% if p.head_image %} <!-- 그림이 있을 경우 -->
+              <img class="card-img-top" src="{{ p.head_image.url }}" alt="Card image cap">  <!-- 이미지 경로 지정 -->
+              {% else %}    <!-- 그림이 없을 경우 -->
+              <img class="card-img-top" src="https://picsum.photos/750/300/?random" alt="Card image cap">   <!-- 픽섬에서 해당 사이즈에 맞는 랜덤 사진 불러옴 -->
+              {% endif %}
               <div class="card-body">
                   <h2 class="card-title">{{ p.title }}</h2>
                   <p class="card-text">{{ p.content }}</p>

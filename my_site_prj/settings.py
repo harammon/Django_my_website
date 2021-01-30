@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -121,3 +122,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+# 이미지 같은 미디어 파일들을 해당 경로로 처리하도록 지정하는 것
+MEDIA_ROOT = os.path.join(BASE_DIR, '_media')   # 프로젝트 내에 이미지 추가 x 설정(media 폴더 내 생성) .. 그러나 이것도 부적절.. 한 폴더 내에 여러 파일 있으면 os가 찾기 오래걸림
+MEDIA_URL = '/media/'   # 이미지 경로 추가 위함 -> urls에 등록해줘야 함
