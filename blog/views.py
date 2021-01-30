@@ -10,7 +10,7 @@ class PostList(ListView):
         return Post.objects.order_by('-created')
 
     # def index(request):
-    #     posts = Post.objects.all()
+    #     posts = Post.objects.all()    # db 명령
     #
     #     return render(
     #         request,
