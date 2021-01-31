@@ -1,6 +1,7 @@
 {% extends 'blog/base.html' %}
+
 {% block content %}
-    <h1>Blog</h1>
+    <h1>Blog {% if category %}<small class="text-muted">: {{ category }}</small> {% endif %}</h1>
     {% if object_list.exists %}       <!-- 그냥 if object_list 만 해도 되지만, 동작 속도가 느림.. -->
         {% for p in object_list %}
             <!-- Blog Post -->

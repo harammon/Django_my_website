@@ -37,7 +37,33 @@ class PostDetail(DetailView):
         context['posts_without_category'] = Post.objects.filter(category=None).count()           # get은 하나만, all은 전부, filter는 특정 조건에 해당하는 것만 가져옴
         return context
 
-
 # def post_detail(request, pk):
 #     blog_post = Post.objects.get(pk=pk)     #read more 눌렀을 때 해당 블로그 포스트 '한 개'만 불러옴
 #     return render(request, 'blog/post_detail.html', {'blog_post' : blog_post })    #request를 넘겨주는 것은 규칙, 그리고 템플릿 이름 / 넘겨줄 것(딕셔너리)
+
+# 이부분 어려움!! 복습 필요!!
+class PostListByCategory(ListView):
+
+    def get_queryset(self):
+        slug = self.kwargs['slug']      # 이런 식으로 url에서 slug를 가져올 수 있다.
+
+        if slug == '_none':
+            category = None
+        else:
+            category = Category.objects.get(slug=slug)
+        return Post.objects.filter(category=category).order_by('-created')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(type(self), self).get_context_data(**kwargs)
+        context['category_list'] = Category.objects.all()
+        context['posts_without_category'] = Post.objects.filter(category=None).count()           # get은 하나만, all은 전부, filter는 특정 조건에 해당하는 것만 가져옴
+
+        slug = self.kwargs['slug']  # 이런 식으로 url에서 slug를 가져올 수 있다.
+        if slug == '_none':
+            context['category'] = '미분류'
+        else:
+            category = Category.objects.get(slug=slug)
+            context['category'] = category
+            # context['title'] = 'Blog - {}'.format(category.name)
+        return context
+

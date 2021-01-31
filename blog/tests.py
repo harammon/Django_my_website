@@ -7,6 +7,12 @@ from django.contrib.auth.models import User
 
 def create_category(name='life', description=''):
     category, is_created = Category.objects.get_or_create(name=name, description=description)  # category가 없을 경우 새로 생성되고, is_created 는 True가 전달된다.
+
+    # slug 위해 추가되는 코드!
+
+    category.slug = category.name.replace(' ', '-').replace('/', '')
+    category.save()     # 바뀐 slug가 save됨
+
     return category
 
 
@@ -82,7 +88,7 @@ class TestView(TestCase):
         # print(title)    # -> 태그 포함 출력
         # print(title.text)   # 사람이 보는 것과 같이 태그 제외하고 출력
 
-        self.assertEqual(title.text, 'Blog')  # 타이틀이 Blog인지 테스트
+        self.assertIn(title.text, 'Blog')  # 타이틀이 Blog인지 테스트
 
         self.check_navbar(soup)
         # navbar = soup.find('div', id='navbar')        함수로 구현 안했을 경우
@@ -122,9 +128,9 @@ class TestView(TestCase):
 
         # category card에서
         self.check_right_side(soup)
-        
+
         # main_div에서 정치/시회가 있어야 함
-        main_div = soup.find('div', id='main_div')
+        main_div = soup.find('div', id='main-div')
         self.assertIn('정치/사회', main_div.text)
         # 미분류 있어야함
         self.assertIn('미분류', main_div.text)
@@ -164,7 +170,7 @@ class TestView(TestCase):
             soup)  # 원래는 post_detail.html 내에 네비바가 없으므로 에러!! -> html 수정 후 (네비 바 추가) 테스트 돌려보기! 이것이 tdd 개발 방식!!
 
         body = soup.body
-        main_div = body.find('div', id='main_div')
+        main_div = body.find('div', id='main-div')
         self.assertIn(post_000.title, main_div.text)
         self.assertIn(post_000.author.username, main_div.text)
 
@@ -172,3 +178,80 @@ class TestView(TestCase):
 
         # category card에서
         self.check_right_side(soup)
+
+    def test_post_list_by_category(self):
+        category_politics = create_category(name='정치/사회')
+
+        post_000 = create_post(
+            title="The first post",
+            content="Hello World. We are the world.",
+            author=self.author_000,
+        )
+        post_001 = create_post(
+            title="The Second post",
+            content="Hello World. We are the world.",
+            author=self.author_000,
+            category=category_politics
+        )
+
+        response = self.client.get(category_politics.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
+        # self.assertEqual('Blog - {}'.format(category_politics.name), soup.title.text)
+
+        main_div = soup.find('div', id = 'main-div')
+        self.assertNotIn('미분류', main_div.text)
+        self.assertIn(category_politics.name, main_div.text)
+
+        def test_post_list_by_category(self):
+            category_politics = create_category(name='정치/사회')
+
+            post_000 = create_post(
+                title="The first post",
+                content="Hello World. We are the world.",
+                author=self.author_000,
+            )
+            post_001 = create_post(
+                title="The Second post",
+                content="Hello World. We are the world.",
+                author=self.author_000,
+                category=category_politics
+            )
+
+            response = self.client.get(category_politics.get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+
+            soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
+            # self.assertEqual('Blog - {}'.format(category_politics.name), soup.title.text)
+
+            main_div = soup.find('div', id='main-div')
+            self.assertNotIn('미분류', main_div.text)
+            self.assertIn(category_politics.name, main_div.text)
+
+
+        # 미분류 눌렀을 때 미분류 잘 모아주는지 확인 테스트
+    def test_post_list_no_category(self):
+        category_politics = create_category(name='정치/사회')
+
+        post_000 = create_post(
+            title="The first post",
+            content="Hello World. We are the world.",
+            author=self.author_000,
+        )
+        post_001 = create_post(
+            title="The Second post",
+            content="Hello World. We are the world.",
+            author=self.author_000,
+            category=category_politics
+        )
+
+        response = self.client.get('/blog/category/_none/')
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
+        # self.assertEqual('Blog - {}'.format(category_politics.name), soup.title.text)
+
+        main_div = soup.find('div', id='main-div')
+        self.assertIn('미분류', main_div.text)
+        self.assertNotIn(category_politics.name, main_div.text)
