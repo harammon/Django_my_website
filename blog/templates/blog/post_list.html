@@ -8,13 +8,19 @@
                 {% if p.head_image %} <!-- 그림이 있을 경우 -->
                     <img class="card-img-top" src="{{ p.head_image.url }}" alt="Card image cap">  <!-- 이미지 경로 지정 -->
                 {% else %}    <!-- 그림이 없을 경우 -->
-                    <img class="card-img-top" src="https://picsum.photos/750/300/?random" alt="Card image cap">   <!-- 픽섬에서 해당 사이즈에 맞는 랜덤 사진 불러옴 -->
+                    <!-- <img class="card-img-top" src="https://picsum.photos/750/300/?random" alt="Card image cap">  픽섬에서 해당 사이즈에 맞는 랜덤 사진 불러옴 -->
                 {% endif %}
+
                 <div class="card-body">
-                <h2 class="card-title">{{ p.title }}</h2>
-                <!--                  <p class="card-text">{{ p.content }}</p>-->
-                <p class="card-text">{{ p.content | truncatewords:50 }}</p>     <!-- 트런케이트! 긴 글에 적용 -->
-                <a href="{{ p.get_absolute_url }}" class="btn btn-primary" id="read-more-post-{{ p.pk }}">Read More &rarr;</a>  <!-- p.get_absolute_url'()' 안써줌!! 예외!!!  -->
+                    {% if p.category %}
+                    <span class="badge badge-primary float-right">{{ p.category }}</span>
+                    {% else %}
+                    <span class="badge badge-primary float-right">미분류</span>
+                    {% endif %}
+                    <h2 class="card-title">{{ p.title }}</h2>
+                    <!--                  <p class="card-text">{{ p.content }}</p>-->
+                    <p class="card-text">{{ p.content | truncatewords:50 }}</p>     <!-- 트런케이트! 긴 글에 적용 -->
+                    <a href="{{ p.get_absolute_url }}" class="btn btn-primary" id="read-more-post-{{ p.pk }}">Read More &rarr;</a>  <!-- p.get_absolute_url'()' 안써줌!! 예외!!!  -->
                 </div>
                 <div class="card-footer text-muted">
                 Posted on {{ p.created }} by
