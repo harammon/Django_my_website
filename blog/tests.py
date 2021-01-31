@@ -62,6 +62,15 @@ class TestView(TestCase):
         self.assertIn('Blog', navbar.text)
         self.assertIn('About me', navbar.text)
 
+    def check_right_side(self, soup):
+        category_card = soup.find('div', id='category-card')
+        # 미분류(1)이 있어야 함
+        self.assertIn('미분류 (1)', category_card.text)
+        # 정치/사회(1)이 있어야 함
+        self.assertIn('정치/사회 (1)', category_card.text)
+
+
+
     def test_post_list_no_post(self):  # 함수 이름에 'test_'는 약속(필수)임 -> 오류 가능성도 있음
         response = self.client.get('/blog/')  # 클라이언트가 해당 브라우저에 접속해서 무엇을 가져올 것임
         self.assertEqual(response.status_code, 200)  # 가져온 것이 200이면 문제가 x ->404에러가 x를 증명
@@ -112,31 +121,30 @@ class TestView(TestCase):
                          post_000.get_absolute_url())  # 버튼을 눌렀을 때의 링크가 해당 포스트의 url과 일치하는지 검사
 
         # category card에서
-        category_card = body.find('div', id='category-card')
-        # 미분류(1)이 있어야 함
-        self.assertIn('미분류 (1)', category_card.text)
-        # 정치/사회(1)이 있어야 함
-        self.assertIn('정치/사회 (1)', category_card.text)
-
-        #main_div에서 정치/시회가 있어야 함
-        main_div = body.find('div', id='main_div')
+        self.check_right_side(soup)
+        
+        # main_div에서 정치/시회가 있어야 함
+        main_div = soup.find('div', id='main_div')
         self.assertIn('정치/사회', main_div.text)
-        #미분류 있어야함
+        # 미분류 있어야함
         self.assertIn('미분류', main_div.text)
 
     # 함수가 실행하는 순간에는, 포스트가 하나도 없음
     def test_post_detail(self):
         # self.assertGreater(Post.objects.count(), 0)  # 0개보다 많으면 통과     -> 함수 동작시에는 다시 포스트가 0개.. 따라서 에러가 나옴!!(테스트 통과 x)
-        # 포스트 생성! -> 테스트는 db를 제로베이스에서 실행하기 때문에 브라우저 상황과는 관계 없이 새로 생성해야함.
+        # 포스트 생성! -> 테스트는 db를 제로베이스에서 실행 q하기 때문에 브라우저 상황과는 관계 없이 새로 생성해야함.
         post_000 = create_post(
-            title="Example",
-            content="Hi",
+            title="The first post",
+            content="Hello World. We are the world.",
             author=self.author_000,
         )
+        post_001 = create_post(
+            title="The Second post",
+            content="Hello World. We are the world.",
+            author=self.author_000,
+            category=create_category(name='정치/사회')
+        )
 
-
-
-        
         self.assertGreater(Post.objects.count(), 0)  # 0개보다 많으면 통과
         post_000_url = post_000.get_absolute_url()
         self.assertEqual(post_000_url,
@@ -161,3 +169,6 @@ class TestView(TestCase):
         self.assertIn(post_000.author.username, main_div.text)
 
         self.assertIn(post_000.content, main_div.text)
+
+        # category card에서
+        self.check_right_side(soup)

@@ -27,8 +27,16 @@ class PostList(ListView):
     #     )
 
 
+
 class PostDetail(DetailView):
     model = Post        # 모델이름_detail 이라는 html 템플릿 필요함!!!!  ->해당 html에서 object.으로 접근 가능
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(PostDetail, self).get_context_data(**kwargs)
+        context['category_list'] = Category.objects.all()
+        context['posts_without_category'] = Post.objects.filter(category=None).count()           # get은 하나만, all은 전부, filter는 특정 조건에 해당하는 것만 가져옴
+        return context
+
 
 # def post_detail(request, pk):
 #     blog_post = Post.objects.get(pk=pk)     #read more 눌렀을 때 해당 블로그 포스트 '한 개'만 불러옴

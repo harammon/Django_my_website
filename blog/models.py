@@ -9,6 +9,9 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:     # 관리자 페이지에서 이름 그대로 가져와서 Category's'가 되었는데, 어색하기 때문에 수정해주기 위함
+        verbose_name_plural = 'Categories'
+
 class Post(models.Model):
     title = models.CharField(max_length=30)
     content = models.TextField()
