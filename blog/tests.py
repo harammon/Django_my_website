@@ -69,7 +69,7 @@ class TestModel(TestCase):
             author=self.author_000,
         )
         post_001.tags.add(tag_001)
-        post_000.save()
+        post_001.save()
 
         self.assertEqual(post_000.tags.count(), 2)# post는 여러 개의 tag를 가질 수 있다.
         self.assertEqual(tag_001.post_set.count(), 2)# 하나의 tag는 여러 개의 post에 붙을 수 있다.
@@ -308,3 +308,35 @@ class TestView(TestCase):
         self.assertIn('미분류', main_div.text)
         self.assertNotIn(category_politics.name, main_div.text)
 
+    def test_tag_page(self):
+        tag_000 = create_tag(name='bad_guy')
+        tag_001 = create_tag(name='america')
+
+        post_000 = create_post(
+            title="The first post",
+            content="Hello World. We are the world.",
+            author=self.author_000,
+        )
+        post_000.tags.add(tag_000)
+        post_000.tags.add(tag_001)
+        post_000.save()
+
+        post_001 = create_post(
+            title="Stay Fool",
+            content="Story about Jobs",
+            author=self.author_000,
+        )
+        post_001.tags.add(tag_001)
+        post_001.save()
+
+        response = self.client.get(tag_000.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
+
+        main_div = soup.find('div', id='main-div')
+        blog_h1 = main_div.find('h1', id='blog-list-title')
+
+        self.assertIn('#{}'.format(tag_000.name), blog_h1.text)
+        self.assertIn(post_000.title, main_div.text)
+        self.assertNotIn(post_001.title, main_div.text)

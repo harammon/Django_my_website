@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Post, Category
+from .models import Post, Category, Tag
 from django.views.generic import ListView, DetailView
 
 # 장고에서 제공하는 선물!! 리스트를 쉽게 생성할 수 있다!
@@ -25,6 +25,22 @@ class PostList(ListView):
     #             'posts': posts,
     #         }
     #     )
+
+class PostListByTag(ListView):
+    def get_queryset(self):
+        tag_slug = self.kwargs['slug']
+        tag = Tag.objects.get(slug=tag_slug)
+
+        return tag.post_set.order_by('-created')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(type(self), self).get_context_data(**kwargs)
+        context['category_list'] = Category.objects.all()
+        context['posts_without_category'] = Post.objects.filter(category=None).count()           # get은 하나만, all은 전부, filter는 특정 조건에 해당하는 것만 가져옴
+        tag_slug = self.kwargs['slug']
+        context['tag'] = Tag.objects.get(slug=tag_slug)
+
+        return context
 
 
 

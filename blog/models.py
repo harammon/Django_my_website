@@ -17,12 +17,18 @@ class Category(models.Model):
     class Meta:     # 관리자 페이지에서 이름 그대로 가져와서 Category's'가 되었는데, 어색하기 때문에 수정해주기 위함
         verbose_name_plural = 'categories'
 
+
 class Tag(models.Model):
     name = models.CharField(max_length=40, unique=True)
     slug = models.SlugField(unique=True, allow_unicode=True)
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return '/blog/tag/{}/'.format(self.slug)        # 슬러그를 자동으로 생성하는 것이 목표
+
+
 
 class Post(models.Model):
     title = models.CharField(max_length=30)
