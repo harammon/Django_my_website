@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
-from .models import Post, Category
+from .models import Post, Category, Tag
 from django.utils import timezone
 from django.contrib.auth.models import User
 
@@ -15,6 +15,12 @@ def create_category(name='life', description=''):
 
     return category
 
+def create_tag(name='some tag'):
+    tag, is_created = Tag.objects.get_or_create(name = name)
+    tag.slug = tag.name.replace(' ', '-').replace('/', '')
+    tag.save()
+
+    return tag
 
 def create_post(title, content, author, category=None):
     blog_post = Post.objects.create(  # 포스트 생성함수! -> 테스트 함수는 db를 제로베이스에서 실행하기 때문에 브라우저 상황과는 관계 없이 새로 생성해야함.
@@ -43,7 +49,32 @@ class TestModel(TestCase):
         )
         self.assertEqual(category.post_set.count(), 1)      #외래키로 등록되어 있기 때문에, 카테고리 객체에서 post를 불러올 수 있다.
                                                             # 이 때의 함수는 클래스 명을 소문자로 하여 접근 가능하다.
+#_set : 자신이 속해 있는 _ 앞에 있는 것을 가져올 수 있음!! -> 추가 검색 요망
+    def test_tag(self):
+        tag_000 = create_tag(name='bad_guy')
+        tag_001 = create_tag(name='america')
 
+        post_000 = create_post(
+            title="The first post",
+            content="Hello World. We are the world.",
+            author=self.author_000,
+        )
+        post_000.tags.add(tag_000)
+        post_000.tags.add(tag_001)
+        post_000.save()
+
+        post_001 = create_post(
+            title="Stay Fool",
+            content="Story about Jobs",
+            author=self.author_000,
+        )
+        post_001.tags.add(tag_001)
+        post_000.save()
+
+        self.assertEqual(post_000.tags.count(), 2)# post는 여러 개의 tag를 가질 수 있다.
+        self.assertEqual(tag_001.post_set.count(), 2)# 하나의 tag는 여러 개의 post에 붙을 수 있다.
+        self.assertEqual(tag_001.post_set.first(), post_000)# 하나의 tag는 자신을 가진 post들을 불러올 수 있다.
+        self.assertEqual(tag_001.post_set.last(), post_001)  # 하나의 tag는 자신을 가진 post들을 불러올 수 있다.
 
     def test_post(self):
         # 포스트 생성! -> 테스트는 db를 제로베이스에서 실행하기 때문에 브라우저 상황과는 관계 없이 새로 생성해야함.

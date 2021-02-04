@@ -17,6 +17,13 @@ class Category(models.Model):
     class Meta:     # 관리자 페이지에서 이름 그대로 가져와서 Category's'가 되었는데, 어색하기 때문에 수정해주기 위함
         verbose_name_plural = 'categories'
 
+class Tag(models.Model):
+    name = models.CharField(max_length=40, unique=True)
+    slug = models.SlugField(unique=True, allow_unicode=True)
+
+    def __str__(self):
+        return self.name
+
 class Post(models.Model):
     title = models.CharField(max_length=30)
     content = models.TextField()
@@ -24,8 +31,9 @@ class Post(models.Model):
                                                     # 이렇게 하면 업로드 날짜에 맞는 폴더에 저장됨!
     created = models.DateTimeField()
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, default=1)   #작성자 user와(미리 정의) 연결!, 참조 무결성 제약
-
     category = models.ForeignKey(Category, blank = True, null = True, on_delete=models.SET_NULL)
+    tags = models.ManyToManyField(Tag)
+
     def __str__(self):
         return '{} :: {}'.format(self.title, self.author)
 
