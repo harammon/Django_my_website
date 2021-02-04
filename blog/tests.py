@@ -131,18 +131,26 @@ class TestView(TestCase):
         self.assertIn('아직 게시물이 없습니다.', soup.body.text)  # 포스트 0개이기 때문에 html 내에서 아직 게시물이 없습니다. 가 동작하고, 따라서 테스트도 통과한다.
 
     def test_post_list_with_post(self):
+        tag_america = create_tag(name='america')
         # 포스트 생성! -> 테스트는 db를 제로베이스에서 실행하기 때문에 브라우저 상황과는 관계 없이 새로 생성해야함.
         post_000 = create_post(
             title="The first post",
             content="Hello World. We are the world.",
             author=self.author_000,
         )
+
+        post_000.tags.add(tag_america)
+        post_000.save()
+
         post_001 = create_post(
             title="The Second post",
             content="Hello World. We are the world.",
             author=self.author_000,
             category=create_category(name='정치/사회')
         )
+
+        post_001.tags.add(tag_america)
+        post_001.save()
 
         self.assertGreater(Post.objects.count(), 0)  # 0개보다 많으면 통과
 
@@ -166,6 +174,11 @@ class TestView(TestCase):
         # 미분류 있어야함
         self.assertIn('미분류', main_div.text)
 
+        # Tag
+        post_card_000 = main_div.find('div', id='post-card-{}'.format(post_000.pk))
+        self.assertIn('#america', post_card_000.text)   #tag가 해당 post의 card마다 있다.
+
+
     # 함수가 실행하는 순간에는, 포스트가 하나도 없음
     def test_post_detail(self):
         # self.assertGreater(Post.objects.count(), 0)  # 0개보다 많으면 통과     -> 함수 동작시에는 다시 포스트가 0개.. 따라서 에러가 나옴!!(테스트 통과 x)
@@ -175,6 +188,11 @@ class TestView(TestCase):
             content="Hello World. We are the world.",
             author=self.author_000,
         )
+
+        tag_america = create_tag(name='america')
+        post_000.tags.add(tag_america)
+        post_000.save()
+
         post_001 = create_post(
             title="The Second post",
             content="Hello World. We are the world.",
@@ -206,9 +224,12 @@ class TestView(TestCase):
         self.assertIn(post_000.author.username, main_div.text)
 
         self.assertIn(post_000.content, main_div.text)
-
         # category card에서
         self.check_right_side(soup)
+
+        # Tag
+        self.assertIn('america', main_div.text)  # tag가 해당 post의 card마다 있다.
+
 
     def test_post_list_by_category(self):
         category_politics = create_category(name='정치/사회')
@@ -286,3 +307,4 @@ class TestView(TestCase):
         main_div = soup.find('div', id='main-div')
         self.assertIn('미분류', main_div.text)
         self.assertNotIn(category_politics.name, main_div.text)
+
