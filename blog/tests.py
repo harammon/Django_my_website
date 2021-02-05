@@ -1,8 +1,9 @@
-from django.test import TestCase, Client
 from bs4 import BeautifulSoup
-from .models import Post, Category, Tag
-from django.utils import timezone
 from django.contrib.auth.models import User
+from django.test import TestCase, Client
+from django.utils import timezone
+
+from .models import Post, Category, Tag
 
 
 def create_category(name='life', description=''):
@@ -37,7 +38,7 @@ def create_post(title, content, author, category=None):
 class TestModel(TestCase):
     def setUp(self):
         self.client = Client()  # 이 클라이언트가 브라우저 역할을 대신 해줄 것임
-        self.author_000 = User.objects.create(username='smith', password='nopassword')  # 새로운 포트스 생성을 위해 user를 생성해줌.
+        self.author_000 = User.objects.create_user(username='smith', password='nopassword')  # 새로운 포트스 생성을 위해 user를 생성해줌.
 
     def test_category(self):
         category = create_category()
@@ -48,8 +49,8 @@ class TestModel(TestCase):
             category=category
         )
         self.assertEqual(category.post_set.count(), 1)      #외래키로 등록되어 있기 때문에, 카테고리 객체에서 post를 불러올 수 있다.
-                                                            # 이 때의 함수는 클래스 명을 소문자로 하여 접근 가능하다.
-#_set : 자신이 속해 있는 _ 앞에 있는 것을 가져올 수 있음!! -> 추가 검색 요망
+        # 이 때의 함수는 클래스 명을 소문자로 하여 접근 가능하다.
+    #_set : 자신이 속해 있는 _ 앞에 있는 것을 가져올 수 있음!! -> 추가 검색 요망
     def test_tag(self):
         tag_000 = create_tag(name='bad_guy')
         tag_001 = create_tag(name='america')
@@ -92,7 +93,8 @@ class TestModel(TestCase):
 class TestView(TestCase):
     def setUp(self):
         self.client = Client()  # 이 클라이언트가 브라우저 역할을 대신 해줄 것임
-        self.author_000 = User.objects.create(username='smith', password='nopassword')  # 새로운 포트스 생성을 위해 user를 생성해줌.
+        self.author_000 = User.objects.create_user(username='smith', password='nopassword')  # 새로운 포트스 생성을 위해 user를 생성해줌.
+        self.user_obama = User.objects.create_user(username='obama', password='nopassword')  # 새로운 포트스 생성을 위해 user를 생성해줌.
 
     def check_navbar(self, soup):
         navbar = soup.find('div', id='navbar')
@@ -183,10 +185,14 @@ class TestView(TestCase):
     def test_post_detail(self):
         # self.assertGreater(Post.objects.count(), 0)  # 0개보다 많으면 통과     -> 함수 동작시에는 다시 포스트가 0개.. 따라서 에러가 나옴!!(테스트 통과 x)
         # 포스트 생성! -> 테스트는 db를 제로베이스에서 실행 q하기 때문에 브라우저 상황과는 관계 없이 새로 생성해야함.
+
+        category_politics = create_category(name='정치/사회')
+
         post_000 = create_post(
             title="The first post",
             content="Hello World. We are the world.",
             author=self.author_000,
+            category=category_politics
         )
 
         tag_america = create_tag(name='america')
@@ -197,7 +203,6 @@ class TestView(TestCase):
             title="The Second post",
             content="Hello World. We are the world.",
             author=self.author_000,
-            category=create_category(name='정치/사회')
         )
 
         self.assertGreater(Post.objects.count(), 0)  # 0개보다 많으면 통과
@@ -229,6 +234,34 @@ class TestView(TestCase):
 
         # Tag
         self.assertIn('america', main_div.text)  # tag가 해당 post의 card마다 있다.
+
+        self.assertIn(category_politics.name, main_div.text)# 카테고리가 main_div에 있다.
+        self.assertNotIn('EDIT', main_div.text)# edit 버튼이 로그인 하지 않은 경우 보이지 않는다.
+
+        login_success = self.client.login(username='smith', password='nopassword')  # 로그인을 한 경우에는
+        self.assertTrue(login_success)
+        # 로그인을 위해 페이지 새로고침을 하는 것과 같은 개념!!
+        response = self.client.get(post_000_url)  # 클라이언트가 해당 브라우저에 접속해서 무엇을 가져올 것임
+        self.assertEqual(response.status_code, 200)  # 가져온 것이 200이면 문제가 x ->404에러가 x를 증명
+
+        soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
+
+        main_div=soup.find('div', id='main-div')
+        self.assertEqual(post_000.author, self.author_000)# post.author와 login한 사용자가 동일하면
+        self.assertIn('EDIT', main_div.text)# edit 버튼이 있다.
+
+        # 그렇지 않은 경우에는 없다.
+        login_success = self.client.login(username='obama', password='nopassword')  # 로그인을 한 경우에는
+        self.assertTrue(login_success)
+        # 로그인을 위해 페이지 새로고침을 하는 것과 같은 개념!!
+        response = self.client.get(post_000_url)  # 클라이언트가 해당 브라우저에 접속해서 무엇을 가져올 것임
+        self.assertEqual(response.status_code, 200)  # 가져온 것이 200이면 문제가 x ->404에러가 x를 증명
+
+        soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
+
+        main_div = soup.find('div', id='main-div')
+        self.assertEqual(post_000.author, self.author_000)  # post.author와 login한 사용자가 동일하면
+        self.assertNotIn('EDIT', main_div.text)  # edit 버튼이 있다.
 
 
     def test_post_list_by_category(self):
