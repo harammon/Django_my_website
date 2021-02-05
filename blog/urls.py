@@ -21,6 +21,7 @@ urlpatterns = [
     path('category/<str:slug>/', views.PostListByCategory.as_view()),
     path('tag/<str:slug>/', views.PostListByTag.as_view()),
     # path('<int:pk>/', views.post_detail),   #함수로 불러올 경우
+    path('<int:pk>/update/', views.PostUpdate.as_view()),  #클래스로 불러올 경우(장고가 준 선물)
     path('<int:pk>/', views.PostDetail.as_view()),  #클래스로 불러올 경우(장고가 준 선물)
     path('', views.PostList.as_view()),
 ]

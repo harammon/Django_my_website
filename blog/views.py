@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Post, Category, Tag
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, UpdateView
 
 # 장고에서 제공하는 선물!! 리스트를 쉽게 생성할 수 있다!
 class PostList(ListView):
@@ -56,6 +56,13 @@ class PostDetail(DetailView):
 # def post_detail(request, pk):
 #     blog_post = Post.objects.get(pk=pk)     #read more 눌렀을 때 해당 블로그 포스트 '한 개'만 불러옴
 #     return render(request, 'blog/post_detail.html', {'blog_post' : blog_post })    #request를 넘겨주는 것은 규칙, 그리고 템플릿 이름 / 넘겨줄 것(딕셔너리)
+
+class PostUpdate(UpdateView):
+    model = Post
+ #   fields = '__all__'  # 포스트 모델에 있는 모든 필드를 가져오라는 의미
+    fields = [
+        'title', 'content', 'head_image', 'category', 'tags'
+    ]
 
 # 이부분 어려움!! 복습 필요!!
 class PostListByCategory(ListView):
