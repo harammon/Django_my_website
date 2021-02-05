@@ -31,11 +31,13 @@
 
 <!-- Preview Image -->
 {% if object.head_image %}
-<img class="img-fluid rounded" src="http://placehold.it/900x300" alt="">
+<img class="card-img-top"  src="{{ object.head_image.url }}" alt="{{ object.title }}"> <!--alt : 그림이 안떳을 때 알려주는 용도 -->
 {% endif %}
-
+<br/>
 <!-- Post Content -->
-{{ object.content }}
+<!--{{ object.content }}-->
+<!--원래는 object.content였지만, 모듈 사용하기 위함(markdown)-->
+{{ object.get_markdown_content | safe }}
 
 <br/>
 {% for tag in object.tags.all %}

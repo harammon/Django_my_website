@@ -21,6 +21,7 @@ from django.conf import settings    # 이미지 추가 위함
 urlpatterns = [
     path('blog/', include('blog.urls')),
     path('admin/', admin.site.urls),
+    path('markdownx/', include('markdownx.urls')),
 
 ]
 
