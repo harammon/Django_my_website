@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Post, Category, Tag
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
-
+from django.contrib.auth.mixins import LoginRequiredMixin   #로그인 한 사람만 접속 가능하게 하도록
 # 장고에서 제공하는 선물!! 리스트를 쉽게 생성할 수 있다!
 class PostList(ListView):
     model = Post
@@ -57,7 +57,7 @@ class PostDetail(DetailView):
 #     blog_post = Post.objects.get(pk=pk)     #read more 눌렀을 때 해당 블로그 포스트 '한 개'만 불러옴
 #     return render(request, 'blog/post_detail.html', {'blog_post' : blog_post })    #request를 넘겨주는 것은 규칙, 그리고 템플릿 이름 / 넘겨줄 것(딕셔너리)
 
-class PostCreate(CreateView):
+class PostCreate(LoginRequiredMixin, CreateView):
     model = Post
     fields = [
         'title', 'content', 'head_image', 'category', 'tags'

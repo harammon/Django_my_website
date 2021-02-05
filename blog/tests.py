@@ -376,6 +376,11 @@ class TestView(TestCase):
 
     def test_post_create(self):
         response = self.client.get('/blog/create/')
+        self.assertNotEqual(response.status_code, 200)
+
+        # 로그인 해야지만 /create 사이트 접속 가능해야함
+        self.client.login(username='smith', password='nopassword')
+        response = self.client.get('/blog/create/')
         self.assertEqual(response.status_code, 200)
 
         soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
