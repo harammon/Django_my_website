@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Post, Category, Tag
-from django.views.generic import ListView, DetailView, UpdateView
+from django.views.generic import ListView, DetailView, UpdateView, CreateView
 
 # 장고에서 제공하는 선물!! 리스트를 쉽게 생성할 수 있다!
 class PostList(ListView):
@@ -56,6 +56,21 @@ class PostDetail(DetailView):
 # def post_detail(request, pk):
 #     blog_post = Post.objects.get(pk=pk)     #read more 눌렀을 때 해당 블로그 포스트 '한 개'만 불러옴
 #     return render(request, 'blog/post_detail.html', {'blog_post' : blog_post })    #request를 넘겨주는 것은 규칙, 그리고 템플릿 이름 / 넘겨줄 것(딕셔너리)
+
+class PostCreate(CreateView):
+    model = Post
+    fields = [
+        'title', 'content', 'head_image', 'category', 'tags'
+    ]
+# 형식이 맞는지 확인하는 함수(오버라이딩)
+    def form_valid(self, form):
+        current_user = self.request.user
+        # 로그인 한 사용자만 포스트 생성을 할 수 있도록
+        if current_user.is_authenticated:
+            form.instance.author = current_user
+            return super(type(self), self).form_valid(form)
+        else:
+            return redirect('/blog/')
 
 class PostUpdate(UpdateView):
     model = Post
