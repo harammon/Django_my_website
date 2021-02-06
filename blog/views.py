@@ -112,9 +112,9 @@ def new_comment(request, pk):
     post = Post.objects.get(pk=pk)
 
     if request.method=='POST':
-        comment_form = CommentForm(request.POST)
-        if comment_form.is_valid(): # 유효한 경우 필요한 것을 채워줘야함. 현재 form에는 text만 받아온 상태.. model 에 저장되어 있는 author 등을 받아와야함
-            comment = comment_form.save(commit=False)
+        comment_form555555 = CommentForm(request.POST)
+        if comment_form555555.is_valid(): # 유효한 경우 필요한 것을 채워줘야함. 현재 form에는 text만 받아온 상태.. model 에 저장되어 있는 author 등을 받아와야함
+            comment = comment_form555555.save(commit=False)
             comment.post = post
             comment.author = request.user
             comment.save()

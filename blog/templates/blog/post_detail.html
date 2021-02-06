@@ -54,7 +54,7 @@
     <div class="card-body">
         <form method="post" action = "{{ object.get_absolute_url }}new_comment/"> {% csrf_token %}
             <div class="form-group">
-                {{ comment_form123123123 | crispy }}
+                {{ comment_form | crispy }}
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>

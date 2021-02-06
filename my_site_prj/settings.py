@@ -43,6 +43,12 @@ INSTALLED_APPS = [
     'blog',
     'markdownx',
     'crispy_forms',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -118,6 +124,17 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+# 소셜 로그인
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_EMAIL_REQUIRED = True # 이메일 필수!
 
 
 # Static files (CSS, JavaScript, Images)
