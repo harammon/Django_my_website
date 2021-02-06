@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase, Client
 from django.utils import timezone
 
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 
 
 def create_category(name='life', description=''):
@@ -22,6 +22,22 @@ def create_tag(name='some tag'):
     tag.save()
 
     return tag
+
+
+
+def create_comment(post, text='a comment', author = None):
+    if author is None:
+        author, is_created = User.objects.get_or_create(
+            username = 'guest',
+            password = 'guestpassword'
+        )
+    comment = Comment.objects.create(
+        post = post,
+        text = text,
+        author =author
+    )
+
+    return comment
 
 def create_post(title, content, author, category=None):
     blog_post = Post.objects.create(  # 포스트 생성함수! -> 테스트 함수는 db를 제로베이스에서 실행하기 때문에 브라우저 상황과는 관계 없이 새로 생성해야함.
@@ -86,6 +102,26 @@ class TestModel(TestCase):
             author=self.author_000,
             category=category
         )
+
+    def test_comment(self):
+        post_000 = create_post(
+            title="The first post",
+            content="Hello World. We are the world.",
+            author=self.author_000,
+        )
+        self.assertEqual(Comment.objects.count(), 0)
+
+        comment_000 = create_comment(
+            post = post_000
+        )
+        comment_001 = create_comment(
+            post=post_000,
+            text = 'second comment'
+        )
+
+        self.assertEqual(Comment.objects.count(), 2)
+        self.assertEqual(post_000.comment_set.count(), 2)
+
 
 
 # Create your tests here.
