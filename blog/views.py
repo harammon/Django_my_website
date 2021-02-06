@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Post, Category, Tag
+from .forms import CommentForm
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin   #로그인 한 사람만 접속 가능하게 하도록
 # 장고에서 제공하는 선물!! 리스트를 쉽게 생성할 수 있다!
@@ -51,6 +52,8 @@ class PostDetail(DetailView):
         context = super(PostDetail, self).get_context_data(**kwargs)
         context['category_list'] = Category.objects.all()
         context['posts_without_category'] = Post.objects.filter(category=None).count()           # get은 하나만, all은 전부, filter는 특정 조건에 해당하는 것만 가져옴
+        context['comment_form'] = CommentForm()
+
         return context
 
 # def post_detail(request, pk):
@@ -105,3 +108,16 @@ class PostListByCategory(ListView):
             # context['title'] = 'Blog - {}'.format(category.name)
         return context
 
+def new_comment(request, pk):
+    post = Post.objects.get(pk=pk)
+
+    if request.method=='POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid(): # 유효한 경우 필요한 것을 채워줘야함. 현재 form에는 text만 받아온 상태.. model 에 저장되어 있는 author 등을 받아와야함
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect(comment.get_absolute_url())
+    else:
+        return redirect('/blog/')

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blog',
     'markdownx',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,6 @@ MEDIA_URL = '/media/'   # 이미지 경로 추가 위함 -> urls에 등록해줘
 # 이미지 파일 다른 파일에 자동으로 올리도록
 from datetime import datetime
 MARKDOWNX_MEDIA_PATH = datetime.now().strftime('markdownx/%Y/%m/%d')
+
+# CRISPY_TEMPLATE_PACK = 'uni_form'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -447,3 +447,26 @@ class TestView(TestCase):
 
         self.assertNotIn('Created', main_div.text)
         self.assertNotIn('Author', main_div.text)
+
+    def test_new_comment(self):
+        post_000 = create_post(
+            title="The first post",
+            content="Hello World. We are the world.",
+            author=self.author_000,
+        )
+
+        login_success = self.client.login(username='smith', password='nopassword')  # 로그인을 한 경우에는
+        self.assertTrue(login_success)
+        
+        # redirect로 온 것이기 때문에, follow라는 것을 해줘야한다.
+        response = self.client.post(
+            post_000.get_absolute_url() + 'new_comment/',
+            {'text' : 'A test comment for the first post'},
+            follow = True
+        )  # post 방식으로 서버에 무언가 전달할 때
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
+        main_div = soup.find('div', id='main-div')
+        self.assertIn(post_000.title, main_div.text)
+        self.assertIn('A test comment', main_div.text)
