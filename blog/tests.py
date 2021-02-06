@@ -231,6 +231,8 @@ class TestView(TestCase):
             category=category_politics
         )
 
+        comment_000 = create_comment(post_000, text = 'a test comment', author = self.user_obama)
+
         tag_america = create_tag(name='america')
         post_000.tags.add(tag_america)
         post_000.save()
@@ -267,6 +269,11 @@ class TestView(TestCase):
         self.assertIn(post_000.content, main_div.text)
         # category card에서
         self.check_right_side(soup)
+
+        # comment
+        comment_div = main_div.find('div', id='comment-list')
+        self.assertIn(comment_000.author.username, comment_div.text)
+        self.assertIn(comment_000.text, comment_div.text)
 
         # Tag
         self.assertIn('america', main_div.text)  # tag가 해당 post의 card마다 있다.
