@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 from .forms import CommentForm
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin   #로그인 한 사람만 접속 가능하게 하도록
@@ -118,6 +118,17 @@ def new_comment(request, pk):
             comment.post = post
             comment.author = request.user
             comment.save()
-            return redirect(comment.get_absolute_url())
+            return redirect(comment.get_absolute_url()) # 해당 댓글로 바로 이동하기 위해 get absolute url 함수 만들었음 -> models에 있음
+    else:
+        return redirect('/blog/')
+
+
+def delete_comment(request, pk):
+    comment = Comment.objects.get(pk=pk)
+
+    if request.user == comment.author:
+        post = comment.post
+        comment.delete()
+        return redirect(post.get_absolute_url() + '#comment-list')
     else:
         return redirect('/blog/')

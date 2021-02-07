@@ -223,16 +223,14 @@ class TestView(TestCase):
         # 포스트 생성! -> 테스트는 db를 제로베이스에서 실행 q하기 때문에 브라우저 상황과는 관계 없이 새로 생성해야함.
 
         category_politics = create_category(name='정치/사회')
-
         post_000 = create_post(
             title="The first post",
             content="Hello World. We are the world.",
             author=self.author_000,
             category=category_politics
         )
-
-        comment_000 = create_comment(post_000, text = 'a test comment', author = self.user_obama)
-        comment_001 = create_comment(post_000, text = 'a test comment', author = self.author_000)
+        comment_000 = create_comment(post_000, text='a test comment', author=self.user_obama)
+        comment_001 = create_comment(post_000, text='a test comment', author=self.author_000)
 
         tag_america = create_tag(name='america')
         post_000.tags.add(tag_america)
@@ -479,3 +477,38 @@ class TestView(TestCase):
         main_div = soup.find('div', id='main-div')
         self.assertIn(post_000.title, main_div.text)
         self.assertIn('A test comment', main_div.text)
+
+    def test_delete_comment(self):
+        post_000 = create_post(
+            title="The first post",
+            content="Hello World. We are the world.",
+            author=self.author_000,
+        )
+
+        comment_000 = create_comment(post_000, text='a test comment', author=self.user_obama)
+        comment_001 = create_comment(post_000, text='a test comment', author=self.author_000)
+
+        self.assertEqual(Comment.objects.count(), 2)
+        self.assertEqual(post_000.comment_set.count(), 2)
+
+# 로그인 사용자만, 본인의 댓글을 지울 수 있도록!
+        # (로그인을 다른 사람으로 했을 때)
+        login_success = self.client.login(username = 'smith', password = 'nopassword')
+        self.assertTrue(login_success)
+
+        response = self.client.get('/blog/delete_comment/{}/'.format(comment_000.pk), follow=True)
+        self.assertEqual(Comment.objects.count(), 2)
+        self.assertEqual(post_000.comment_set.count(), 2)
+
+#로그인을 오바마로 했을 때
+        login_success = self.client.login(username='obama', password='nopassword')
+        response = self.client.get('/blog/delete_comment/{}/'.format(comment_000.pk), follow = True)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(Comment.objects.count(), 1)
+        self.assertEqual(post_000.comment_set.count(), 1)
+
+        soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
+        main_div = soup.find('div', id='main-div')
+
+        self.assertNotIn('obama', main_div)
