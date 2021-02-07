@@ -19,6 +19,7 @@ from django.conf.urls.static import static  # 이미지 추가 위함
 from django.conf import settings    # 이미지 추가 위함
 
 urlpatterns = [
+    path('', include('blog.urls')), # 로그아웃 했을 때 블로그 페이지로 이동하기 위함
     path('blog/', include('blog.urls')),
     path('admin/', admin.site.urls),
     path('markdownx/', include('markdownx.urls')),

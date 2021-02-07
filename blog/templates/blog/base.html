@@ -9,6 +9,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="stylesheet" href="{% static 'blog/bootstrap/bootstrap.css' %}" media="screen">
     <link rel="stylesheet" href="{% static 'blog/_assets/css/custom.min.css' %}">
+<!--    구글 이미지-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 </head>
 <body>
 <div class="navbar navbar-expand-lg fixed-top navbar-light bg-light" id="navbar">   <!-- 네비게이션 바 색 변경 가능 + 테스트를 위해 id 지정-->
@@ -66,9 +68,57 @@
                     </div>
                 </li>
             </ul>
+            <ul class="nav navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" id="download">{{ user }} <span class="caret"></span></a>
+                        <div class="dropdown-menu" aria-labelledby="download">
+    <!--                        <a class="dropdown-item" rel="noopener" target="_blank" href="https://jsfiddle.net/bootswatch/3he50zsf/">Open in JSFiddle</a>-->
+    <!--                        <div class="dropdown-divider"></div>-->
+    <!--                        <a class="dropdown-item" href="../4/simplex/bootstrap.min.css" download>bootstrap.min.css</a>-->
+    <!--                        <a class="dropdown-item" href="../4/simplex/bootstrap.css" download>bootstrap.css</a>-->
+    <!--                        <div class="dropdown-divider"></div>-->
+    <!--                        <a class="dropdown-item" href="../4/simplex/_variables.scss" download>_variables.scss</a>-->
+                            <a class="dropdown-item" href="/accounts/logout/">Log out</a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <!-- Button trigger modal -->
+<!--                        모달 클래스의 아이디랑 일치해야 함-->
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#loginModal">
+                          Log in
+                        </button>
+
+                    </li>
+                {% endif %}
+            </ul>
         </div>
     </div>
 </div>
+<!--추가해주기!!-->
+{% load socialaccount %}
+
+<!-- Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Please Log in</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+<!--                구글 이미지-->
+                <a role = 'button' class="btn btn-primary" href="{% provider_login_url 'google'%}"><i class="fab fa-google"></i> Log in with Google</a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <div class = "container">   <!-- 웹 내용을 안쪽으로 이동시키기 위함 -->

@@ -151,3 +151,6 @@ MARKDOWNX_MEDIA_PATH = datetime.now().strftime('markdownx/%Y/%m/%d')
 
 # CRISPY_TEMPLATE_PACK = 'uni_form'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# 로그인 시 이동되는 url 지정
+LOGIN_REDIRECT_URL = '/blog/'
