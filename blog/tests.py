@@ -495,8 +495,11 @@ class TestView(TestCase):
         # (로그인을 다른 사람으로 했을 때)
         login_success = self.client.login(username = 'smith', password = 'nopassword')
         self.assertTrue(login_success)
-
-        response = self.client.get('/blog/delete_comment/{}/'.format(comment_000.pk), follow=True)
+# delete comment를 class뷰로 구현하면서, 예외를 발생시켰기 때문에 with 구문을 추가해줘야한다.
+        with self.assertRaises(PermissionError):
+            response = self.client.get('/blog/delete_comment/{}/'.format(comment_000.pk), follow=True)
+        # 원래는 with 구문 없이 이 상태였음.
+        # response = self.client.get('/blog/delete_comment/{}/'.format(comment_000.pk), follow=True)
         self.assertEqual(Comment.objects.count(), 2)
         self.assertEqual(post_000.comment_set.count(), 2)
 
@@ -504,6 +507,7 @@ class TestView(TestCase):
         login_success = self.client.login(username='obama', password='nopassword')
         response = self.client.get('/blog/delete_comment/{}/'.format(comment_000.pk), follow = True)
         self.assertEqual(response.status_code, 200)
+
 
         self.assertEqual(Comment.objects.count(), 1)
         self.assertEqual(post_000.comment_set.count(), 1)
