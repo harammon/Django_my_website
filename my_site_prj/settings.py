@@ -135,7 +135,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 ACCOUNT_EMAIL_REQUIRED = True # 이메일 필수!
-
+ACCOUNT_EMAIL_VERIFICATION = 'none' # 처음 회원가입하고 로그인 시 에러나는 거 방지
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
