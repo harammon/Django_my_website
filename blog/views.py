@@ -123,26 +123,27 @@ def new_comment(request, pk):
         return redirect('/blog/')
 
 
-class CommentDelete(DeleteView):
-    model = Comment
+def delete_comment(request, pk):
+    comment = Comment.objects.get(pk=pk)
 
-    def get_object(self, queryset = None):
-        comment = super(CommentDelete, self).get_object()  #super는 deleteview를 지칭
-        if comment.author != self.request.user:
-            raise PermissionError('Comment 삭제 권한이 없습니다.')
-        return comment
+    if request.user == comment.author:
+        post = comment.post
+        comment.delete()
+        return redirect(post.get_absolute_url() + '#comment-list')
+    else:
+        raise PermissionError('Comment를 삭제할 권한이 없습니다.')
 
-    def get_success_url(self):
-        post = self.get_object().post   #get_object()는 클래스에서 제공하는 함수! 
-        return post.get_absolute_url() + '#comment-list'    #id 주소를 추가
-
-
-# def delete_comment(request, pk):
-#     comment = Comment.objects.get(pk=pk)
+# class CommentDelete(DeleteView):
+#     model = Comment
 #
-#     if request.user == comment.author:
-#         post = comment.post
-#         comment.delete()
-#         return redirect(post.get_absolute_url() + '#comment-list')
-#     else:
-#         return redirect('/blog/')
+#     def get_object(self, queryset = None):
+#         comment = super(CommentDelete, self).get_object()  #super는 deleteview를 지칭
+#         if comment.author != self.request.user:
+#             raise PermissionError('Comment 삭제 권한이 없습니다.')
+#         return comment
+#
+#     def get_success_url(self):
+#         post = self.get_object().post   #get_object()는 클래스에서 제공하는 함수!
+#         return post.get_absolute_url() + '#comment-list'    #id 주소를 추가
+
+

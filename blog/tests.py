@@ -499,9 +499,10 @@ class TestView(TestCase):
         with self.assertRaises(PermissionError):
             response = self.client.get('/blog/delete_comment/{}/'.format(comment_000.pk), follow=True)
         # 원래는 with 구문 없이 이 상태였음.
+
         # response = self.client.get('/blog/delete_comment/{}/'.format(comment_000.pk), follow=True)
-        self.assertEqual(Comment.objects.count(), 2)
-        self.assertEqual(post_000.comment_set.count(), 2)
+            self.assertEqual(Comment.objects.count(), 2)
+            self.assertEqual(post_000.comment_set.count(), 2)
 
 #로그인을 오바마로 했을 때
         login_success = self.client.login(username='obama', password='nopassword')
