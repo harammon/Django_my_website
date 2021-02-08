@@ -23,6 +23,8 @@ urlpatterns = [
     # path('<int:pk>/', views.post_detail),   #함수로 불러올 경우
     path('<int:pk>/update/', views.PostUpdate.as_view()),  #클래스로 불러올 경우(장고가 준 선물)
 
+    path('edit_comment/<int:pk>/', views.CommentUpdate.as_view()),
+
     path('delete_comment/<int:pk>/', views.delete_comment),
     # path('delete_comment/<int:pk>/', views.CommentDelete.as_view()),
 
