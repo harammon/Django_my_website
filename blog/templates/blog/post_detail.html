@@ -65,8 +65,14 @@
     <!-- Single Comment -->
     {% for comment in object.comment_set.all %}
     <div class="media mb-4" id="comment-id-{{ comment.pk }}">   <!-- 해당 댓글로 바로 이동하기 위해 id 주기 -->
-        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+        {% if comment.author.socialaccount_set.all.0.get_avatar_url %}
+        <img width = "50px" class="d-flex mr-3 rounded-circle" src="{{ comment.author.socialaccount_set.all.0.get_avatar_url }}" alt="">
+        {% else %}
+        <img width = "50px" class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+<!--        <img width = "50px" class="d-flex mr-3 rounded-circle" src="http://api.adorable.io/avatars/285{{ comment.author }}.png" alt="">-->
+        {% endif %}
         <div class="media-body">
+
 <!--현재 user와 글쓴이가 동일해야지만 버튼이 나와야 함-->
             {% if comment.author == request.user %}
                 <button class="btn btn-sm btn-info float-right" onclick="location.href='/blog/edit_comment/{{ comment.pk }}/'">edit</button>
