@@ -3,6 +3,9 @@ from .models import Post, Category, Tag, Comment
 from .forms import CommentForm
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin   #로그인 한 사람만 접속 가능하게 하도록
+from django.db.models import Q
+
+
 # 장고에서 제공하는 선물!! 리스트를 쉽게 생성할 수 있다!
 class PostList(ListView):
     model = Post
@@ -28,6 +31,12 @@ class PostList(ListView):
     #             'posts': posts,
     #         }
     #     )
+
+class PostSearch(PostList):
+    def get_queryset(self):
+        q = self.kwargs['q']
+        object_list = Post.objects.filter(Q(title__contains=q) | Q(content__contains=q))
+        return object_list
 
 class PostListByTag(ListView):
     def get_queryset(self):
