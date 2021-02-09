@@ -38,6 +38,12 @@ class PostSearch(PostList):
         object_list = Post.objects.filter(Q(title__contains=q) | Q(content__contains=q))
         return object_list
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(PostSearch, self).get_context_data()
+        context['search_info'] = 'Search: "{}"'.format(self.kwargs['q'])
+        return context
+
+
 class PostListByTag(ListView):
     def get_queryset(self):
         tag_slug = self.kwargs['slug']
