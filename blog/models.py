@@ -42,6 +42,10 @@ class Post(models.Model):
     category = models.ForeignKey(Category, blank = True, null = True, on_delete=models.SET_NULL)
     tags = models.ManyToManyField(Tag, blank = True)
 
+# 페이지네이션 때문에 추가해줌
+    class Meta:
+        ordering = ['-created', ]
+
     def __str__(self):
         return '{} :: {}'.format(self.title, self.author)
 

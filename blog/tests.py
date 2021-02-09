@@ -216,6 +216,37 @@ class TestView(TestCase):
         post_card_000 = main_div.find('div', id='post-card-{}'.format(post_000.pk))
         self.assertIn('#america', post_card_000.text)   #tag가 해당 post의 card마다 있다.
 
+    # 페이지네이션
+    def test_pagination(self):
+        # post가 적은 경우
+        for i in range(0, 3):
+            post_000 = create_post(
+                title="The post No. {}".format(i),
+                content="{}".format(i),
+                author=self.author_000,
+            )
+
+        response = self.client.get('/blog/')
+        self.assertEqual(response.status_code, 200)  # 가져온 것이 200이면 문제가 x ->404에러가 x를 증명
+        soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
+
+        self.assertNotIn('Older', soup.body.text)
+        self.assertNotIn('Newer', soup.body.text)
+
+        # post가 많은 경우
+        for i in range(3, 10):
+            post_000 = create_post(
+                title="The post No. {}".format(i),
+                content="{}".format(i),
+                author=self.author_000,
+            )
+
+        response = self.client.get('/blog/')
+        self.assertEqual(response.status_code, 200)  # 가져온 것이 200이면 문제가 x ->404에러가 x를 증명
+        soup = BeautifulSoup(response.content, 'html.parser')  # 컨텐츠(내용)를 가져와서 html 파서로 파싱을 함
+
+        self.assertIn('Older', soup.body.text)
+        self.assertIn('Newer', soup.body.text)
 
     # 함수가 실행하는 순간에는, 포스트가 하나도 없음
     def test_post_detail(self):

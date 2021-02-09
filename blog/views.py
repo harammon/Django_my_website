@@ -6,9 +6,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin   #로그인 한 사�
 # 장고에서 제공하는 선물!! 리스트를 쉽게 생성할 수 있다!
 class PostList(ListView):
     model = Post
+    paginate_by = 5 # 페이지네이션 기준 포스트 개수
 
-    def get_queryset(self):
-        return Post.objects.order_by('-created')
+    # model의 Post 클래스에서 Meta 클래스로 줬음
+    # def get_queryset(self):
+    #     return Post.objects.order_by('-created')
 
     # 이 함수는 장고에서 기본으로 정해놓은것... 이해하려 하지 말고 가져다가 쓰기!!
     def get_context_data(self, *, object_list=None, **kwargs):
